@@ -20,7 +20,7 @@ export class Anime {
             let data = await res.json();
 
             if (res.status >= 400 || data.error === true) {
-                throw new Error(data.message);
+                return data;
             }
 
             return data.data;
@@ -43,7 +43,7 @@ export class Anime {
             let data = await res.json();
 
             if (res.status >= 400 || data.error === true) {
-                throw new Error(data.message);
+                return data;
             }
 
             return data.data;
@@ -59,34 +59,42 @@ export class Anime {
         score: number
     ) {
         try {
-            let url = new URL(
-                this.baseUrl.toString() + `anime/${animeId}/${episode}/vote`
-            );
-            let body = {
-                user: userId,
-                score: score,
-            };
-            let res = await fetch(url.toString(), {
-                method: "PUT",
-                headers: {
-                    Authorization: this.token,
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify(body),
-            });
+            if (score > 0 && score <= 10) {
+                let url = new URL(
+                    this.baseUrl.toString() + `anime/${animeId}/${episode}/vote`
+                );
+                let body = {
+                    user: userId,
+                    score: score,
+                };
+                let res = await fetch(url.toString(), {
+                    method: "PUT",
+                    headers: {
+                        Authorization: this.token,
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                    body: JSON.stringify(body),
+                });
 
-            let data = await res.json();
+                let data = await res.json();
 
-            if (res.status >= 400 || data.error === true) {
-                throw new Error(data.message);
+                if (res.status >= 400 || data.error === true) {
+                    return data;
+                }
+
+                try {
+                    await this.follow(animeId, userId, "add");
+                } catch (err) { }
+
+                return data.data;
+            } else {
+                return {
+                    error: true,
+                    message: "The score must be a number between 1 and 10"
+                }
             }
 
-            try {
-                await this.follow(animeId, userId, "add");
-            } catch (err) {}
-
-            return data.data;
         } catch (err) {
             console.error(err);
         }
@@ -113,7 +121,8 @@ export class Anime {
 
             let data = await res.json();
             if (res.status >= 400 || data.error === true) {
-                throw new Error(data.message);
+                return data;
+
             }
             return data.data;
         } catch (err) {

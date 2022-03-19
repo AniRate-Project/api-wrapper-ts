@@ -1,5 +1,5 @@
 # Wrapper of the [API](https://github.com/AniRate-Project/anirate-api) written in TypeScript
-The wrapper will be soon relased as a npm module, until then you can clone the repsitory.
+The wrapper will be soon relased as a npm module, until then you can clone the repository.
 ## Example
 ```js
 const { Anime } = require('./aniRate.js');
